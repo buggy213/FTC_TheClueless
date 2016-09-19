@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.os.Environment;
+
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -49,7 +51,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.lasarobotics.library.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +101,14 @@ public class VuforiaWaypointMovement extends LinearOpMode {
      */
     VuforiaLocalizer vuforia;
 
+    OpenGLMatrix[] waypoints;
+    public void LoadWaypoints () {
+
+        ArrayList<OpenGLMatrix> matrices = new ArrayList<>();
+
+
+    }
+
     @Override public void runOpMode() throws InterruptedException {
         /**
          * Start up Vuforia, telling it the id of the view that we wish to use as the parent for
@@ -142,15 +154,17 @@ public class VuforiaWaypointMovement extends LinearOpMode {
         VuforiaTrackable tools  = pictures.get(1);
         tools.setName("Tools");  // Tools picture
 
-        VuforiaTrackable legos  = pictures.get(1);
+        VuforiaTrackable legos  = pictures.get(2);
         legos.setName("Legos");  // Legos picture
 
-        VuforiaTrackable gears  = pictures.get(1);
+        VuforiaTrackable gears  = pictures.get(3);
         gears.setName("Gears");  // Gears picture
 
         /** For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<>();
         allTrackables.addAll(pictures);
+
+        Log positionLog = new Log(Environment.getExternalStorageDirectory().getPath(), "VuforiaLog");
 
         /**
          * We use units of mm here because that's the recommended units of measurement for the
@@ -324,12 +338,15 @@ public class VuforiaWaypointMovement extends LinearOpMode {
             if (lastLocation != null) {
                 //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
                 telemetry.addData("Pos", format(lastLocation));
+                positionLog.add("Position", format(lastLocation));
             } else {
                 telemetry.addData("Pos", "Unknown");
             }
             telemetry.update();
             idle();
         }
+
+        positionLog.saveAs(Log.FileType.JSON);
     }
 
     /**
